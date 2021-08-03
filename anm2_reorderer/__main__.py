@@ -25,6 +25,7 @@ class MainWindow(wx.Frame):
 
         exit_menu_item: wx.MenuItem = wx.MenuItem(
             file_menu, wx.ID_EXIT, "Exit")
+        self.Bind(wx.EVT_MENU, self.OnExit, exit_menu_item)
         file_menu.Append(exit_menu_item)
 
         menu_bar: wx.MenuBar = wx.MenuBar()
@@ -32,6 +33,9 @@ class MainWindow(wx.Frame):
         menu_bar.Append(file_menu, "&File")
 
         self.SetMenuBar(menu_bar)
+
+    def OnExit(self, _) -> None:
+        self.Close()
 
 
 app = wx.App()
