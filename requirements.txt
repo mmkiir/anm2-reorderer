@@ -1,7 +1,10 @@
 autopep8==1.5.7
+mypy==0.910
+mypy-extensions==0.4.3
 numpy==1.21.1
 Pillow==8.3.1
 pycodestyle==2.7.0
 six==1.16.0
 toml==0.10.2
+typing-extensions==3.10.0.0
 wxPython==4.1.1
