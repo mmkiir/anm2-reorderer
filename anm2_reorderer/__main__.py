@@ -2,7 +2,36 @@
 
 import wx
 import xml.etree.ElementTree as ET
+from functools import partial
 from typing import Any, Optional, cast
+
+
+def get_animations(root: ET.ElementTree) -> Optional[ET.Element]:
+    return root.find('Animations')
+
+
+def get_animation(root: ET.ElementTree, name: str) -> Optional[ET.Element]:
+    return root.find(f'Animations/Animation[@Name="{name}"]')
+
+
+def move_animation(new_index: int, animations: ET.Element, animation: ET.Element) -> None:
+    animations.remove(animation)
+    animations.insert(new_index, animation)
+
+
+def shift_animation(shift_by: int, animations: ET.Element, animation: ET.Element) -> None:
+    index: int = list(animations.iter('Animation')).index(animation)
+
+    if shift_by < 0 and index == 0 or shift_by > 0 and index == len(list(animation.iter('Animations'))) - 1:
+        return
+
+    move_animation(index + shift_by, animations, animation)
+
+
+shift_animation_up: partial = partial(shift_animation, -1)
+
+
+shift_animation_down: partial = partial(shift_animation, 1)
 
 
 class MainWindow(wx.Frame):
@@ -98,7 +127,7 @@ class MainWindow(wx.Frame):
                     if not animations:
                         return
 
-                    animations = cast(ET.Element, animations)
+                    assert animations is not None
 
                     self.list_box.InsertItems(
                         [animation.attrib['Name'] for animation in animations.iter('Animation')], 0)
@@ -110,10 +139,60 @@ class MainWindow(wx.Frame):
         self.Close()
 
     def OnMoveUp(self, _) -> None:
-        pass
+        if not self.current_file_root:
+            return
+
+        assert self.current_file_root is not None
+
+        animations = get_animations(self.current_file_root)
+
+        if not animations:
+            return
+
+        assert animations is not None
+
+        animation = get_animation(
+            self.current_file_root, self.list_box.GetStringSelection())
+
+        if not animation:
+            return
+
+        assert animation is not None
+
+        shift_animation_up(animations, animation)
+
+        self.list_box.Clear()
+        self.list_box.InsertItems([animation.attrib['Name']
+                                  for animation in animations.iter('Animation')], 0)
+        self.list_box.SetStringSelection(animation.attrib['Name'])
 
     def OnMoveDown(self, _) -> None:
-        pass
+        if not self.current_file_root:
+            return
+
+        assert self.current_file_root is not None
+
+        animations = get_animations(self.current_file_root)
+
+        if not animations:
+            return
+
+        assert animations is not None
+
+        animation = get_animation(
+            self.current_file_root, self.list_box.GetStringSelection())
+
+        if not animation:
+            return
+
+        assert animation is not None
+
+        shift_animation_down(animations, animation)
+
+        self.list_box.Clear()
+        self.list_box.InsertItems([animation.attrib['Name']
+                                  for animation in animations.iter('Animation')], 0)
+        self.list_box.SetStringSelection(animation.attrib['Name'])
 
     def OnRename(self, _) -> None:
         pass
