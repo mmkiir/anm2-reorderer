@@ -130,8 +130,6 @@ class MainWindow(wx.Frame):
                     if not animations:
                         return
 
-                    assert animations is not None
-
                     self.list_box.Clear()
                     self.list_box.InsertItems(
                         [animation.attrib['Name'] for animation in animations.iter('Animation')], 0)
@@ -146,22 +144,16 @@ class MainWindow(wx.Frame):
         if not self.root:
             return
 
-        assert self.root is not None
-
         animations = get_animations(self.root)
 
         if not animations:
             return
-
-        assert animations is not None
 
         animation = get_animation(
             self.root, self.list_box.GetStringSelection())
 
         if not animation:
             return
-
-        assert animation is not None
 
         shift_animation_up(animations, animation)
 
@@ -174,22 +166,16 @@ class MainWindow(wx.Frame):
         if not self.root:
             return
 
-        assert self.root is not None
-
         animations = get_animations(self.root)
 
         if not animations:
             return
-
-        assert animations is not None
 
         animation = get_animation(
             self.root, self.list_box.GetStringSelection())
 
         if not animation:
             return
-
-        assert animation is not None
 
         shift_animation_down(animations, animation)
 
