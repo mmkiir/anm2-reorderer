@@ -53,6 +53,7 @@ class MainWindow(wx.Frame):
         save_menu_item: wx.MenuItem = wx.MenuItem(
             file_menu, wx.ID_SAVE, "&Save")
         file_menu.Append(save_menu_item)
+        self.Bind(wx.EVT_MENU, self.OnSave, save_menu_item)
 
         saveas_menu_item: wx.MenuItem = wx.MenuItem(
             file_menu, wx.ID_SAVEAS, "&Save As...")
@@ -201,6 +202,16 @@ class MainWindow(wx.Frame):
 
     def OnDelete(self, _) -> None:
         pass
+
+    def OnSave(self, _) -> None:
+        if not self.file_path or not self.tree:
+            return
+        try:
+            with open(self.file_path, 'w') as file:
+                self.tree.write(self.file_path)
+                self.file_is_saved = True
+        except IOError:
+            wx.LogError(f"Cannot open file {self.file_path}")
 
 
 app = wx.App()
