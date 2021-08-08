@@ -132,6 +132,7 @@ class MainWindow(wx.Frame):
 
                     assert animations is not None
 
+                    self.list_box.Clear()
                     self.list_box.InsertItems(
                         [animation.attrib['Name'] for animation in animations.iter('Animation')], 0)
 
