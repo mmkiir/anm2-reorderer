@@ -6,11 +6,11 @@ from functools import partial
 from typing import Any, Optional, cast
 
 
-def get_animations(root: ET.ElementTree) -> Optional[ET.Element]:
+def get_animations(root: ET.Element) -> Optional[ET.Element]:
     return root.find('Animations')
 
 
-def get_animation(root: ET.ElementTree, name: str) -> Optional[ET.Element]:
+def get_animation(root: ET.Element, name: str) -> Optional[ET.Element]:
     return root.find(f'Animations/Animation[@Name="{name}"]')
 
 
@@ -38,9 +38,10 @@ class MainWindow(wx.Frame):
     def __init__(self, *args, **kw) -> None:
         super().__init__(*args, **kw)
 
-        self.current_file_path: Optional[str] = None
-        self.current_file_root: Optional[ET.ElementTree] = None
-        self.current_file_is_saved: bool = False
+        self.file_path: Optional[str] = None
+        self.file_is_saved: bool = False
+        self.tree: Optional[ET.ElementTree] = None
+        self.root: Optional[ET.Element] = None
 
         file_menu: wx.Menu = wx.Menu()
 
@@ -118,11 +119,12 @@ class MainWindow(wx.Frame):
             file_path = file_dialog.GetPath()
             try:
                 with open(file_path, 'r') as file:
-                    self.current_file_path = file_path
-                    self.current_file_is_saved = True
-                    self.current_file_root = ET.parse(file_path)
+                    self.file_path = file_path
+                    self.file_is_saved = True
+                    self.tree = ET.parse(file_path)
+                    self.root = self.tree.getroot()
 
-                    animations = self.current_file_root.find('Animations')
+                    animations = get_animations(self.root)
 
                     if not animations:
                         return
@@ -139,12 +141,12 @@ class MainWindow(wx.Frame):
         self.Close()
 
     def OnMoveUp(self, _) -> None:
-        if not self.current_file_root:
+        if not self.root:
             return
 
-        assert self.current_file_root is not None
+        assert self.root is not None
 
-        animations = get_animations(self.current_file_root)
+        animations = get_animations(self.root)
 
         if not animations:
             return
@@ -152,7 +154,7 @@ class MainWindow(wx.Frame):
         assert animations is not None
 
         animation = get_animation(
-            self.current_file_root, self.list_box.GetStringSelection())
+            self.root, self.list_box.GetStringSelection())
 
         if not animation:
             return
@@ -167,12 +169,12 @@ class MainWindow(wx.Frame):
         self.list_box.SetStringSelection(animation.attrib['Name'])
 
     def OnMoveDown(self, _) -> None:
-        if not self.current_file_root:
+        if not self.root:
             return
 
-        assert self.current_file_root is not None
+        assert self.root is not None
 
-        animations = get_animations(self.current_file_root)
+        animations = get_animations(self.root)
 
         if not animations:
             return
@@ -180,7 +182,7 @@ class MainWindow(wx.Frame):
         assert animations is not None
 
         animation = get_animation(
-            self.current_file_root, self.list_box.GetStringSelection())
+            self.root, self.list_box.GetStringSelection())
 
         if not animation:
             return
