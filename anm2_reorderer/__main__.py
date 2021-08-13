@@ -165,6 +165,8 @@ class MainWindow(wx.Frame):
 
         shift_animation_up(animations, animation)
 
+        self.file_is_saved = False
+
         self.list_box.Clear()
         self.list_box.InsertItems([animation.attrib['Name']
                                   for animation in animations.iter('Animation')], 0)
@@ -186,6 +188,8 @@ class MainWindow(wx.Frame):
             return
 
         shift_animation_down(animations, animation)
+
+        self.file_is_saved = False
 
         self.list_box.Clear()
         self.list_box.InsertItems([animation.attrib['Name']
