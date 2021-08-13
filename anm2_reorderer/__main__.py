@@ -138,6 +138,14 @@ class MainWindow(wx.Frame):
                 wx.LogError(f"Cannot open file {file_path}")
 
     def OnExit(self, _) -> None:
+        if self.file_is_saved == False:
+            with wx.MessageDialog(self, "There are unsaved changes. Are you sure you want to exit?", style=wx.YES_NO) as dialog:
+                selection = dialog.ShowModal()
+                if selection == wx.YES:
+                    self.Close()
+                else:
+                    return
+
         self.Close()
 
     def OnMoveUp(self, _) -> None:
