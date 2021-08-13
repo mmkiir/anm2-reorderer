@@ -208,7 +208,26 @@ class MainWindow(wx.Frame):
             self.list_box.SetStringSelection(animation.attrib['Name'])
 
     def OnDelete(self, _) -> None:
-        pass
+        if not (selection := self.list_box.GetStringSelection()):
+            return
+
+        if not self.root:
+            return
+
+        if not (animations := get_animations(self.root)):
+            return
+
+        if not (animation := get_animation(self.root, selection)):
+            return
+
+        animations.remove(animation)
+
+        self.file_is_saved = False
+
+        self.list_box.Clear()
+        self.list_box.InsertItems([animation.attrib['Name']
+                                   for animation in animations.iter('Animation')], 0)
+        self.list_box.SetStringSelection(animation.attrib['Name'])
 
     def OnSave(self, _) -> None:
         if not self.file_path or not self.tree:
